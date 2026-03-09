@@ -9,7 +9,8 @@ class RoomManager {
         const roomId = crypto.randomUUID();
         const room = {
             id: roomId,
-            players: [player1, player2],
+            players: [player1, player2], // length 2 max
+            spectators: [], // array of spectator sockets
             createdAt: Date.now()
         };
         this.rooms.set(roomId, room);
@@ -31,6 +32,28 @@ class RoomManager {
 
     removeRoom(roomId) {
         this.rooms.delete(roomId);
+    }
+
+    addSpectator(roomId, spectator) {
+        const room = this.getRoom(roomId);
+        if (room && room.players.length === 2) {
+            room.spectators.push(spectator);
+            spectator.join(roomId);
+            spectator.roomId = roomId;
+            spectator.isSpectator = true;
+            return true;
+        }
+        return false;
+    }
+
+    getActiveRoom() {
+        // Find the first room that is currently playing (has 2 players max)
+        for (const room of this.rooms.values()) {
+            if (room.players.length === 2) {
+                return room;
+            }
+        }
+        return null;
     }
 
     getOpponent(roomId, playerId) {
