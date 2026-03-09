@@ -10,6 +10,13 @@ export class MultiplayerHandler {
         // 스케일 설정: 150/10 = 15, 300/20 = 15
         this.opponentCtx.scale(15, 15);
         this.opponentScoreElement = document.getElementById('opponent-score');
+        this.opponentScoreElement = document.getElementById('opponent-score');
+        
+        // Spectator elements
+        this.specCanvasP1 = document.getElementById('spec-canvas-p1');
+        this.specCanvasP2 = document.getElementById('spec-canvas-p2');
+        if (this.specCanvasP1) this.specCtxP1 = this.specCanvasP1.getContext('2d');
+        if (this.specCanvasP2) this.specCtxP2 = this.specCanvasP2.getContext('2d');
         
         this.isSpectator = false;
         this.spectatorPlayers = [];
@@ -71,11 +78,9 @@ export class MultiplayerHandler {
         this.socket.on('spectatorBoardUpdate', (payload) => {
             if (this.isSpectator) {
                 if (payload.playerId === this.spectatorPlayers[0]) {
-                    // Update main canvas directly as Player 1
-                    this.drawSpectatorMainBoard(payload.board);
+                    this.drawSpectatorMainBoard(payload.board, 1);
                 } else if (payload.playerId === this.spectatorPlayers[1]) {
-                    // Update opponent canvas as Player 2
-                    this.drawOpponentBoard(payload.board);
+                    this.drawSpectatorMainBoard(payload.board, 2);
                 }
             }
         });
@@ -83,9 +88,9 @@ export class MultiplayerHandler {
         this.socket.on('spectatorScoreUpdate', (payload) => {
             if (this.isSpectator) {
                 if (payload.playerId === this.spectatorPlayers[0]) {
-                    document.getElementById('player1-score').textContent = payload.score;
+                    document.getElementById('spec-score-p1').textContent = payload.score;
                 } else if (payload.playerId === this.spectatorPlayers[1]) {
-                    this.opponentScoreElement.textContent = payload.score;
+                    document.getElementById('spec-score-p2').textContent = payload.score;
                 }
             }
         });
@@ -107,13 +112,9 @@ export class MultiplayerHandler {
         window.menuUI.opponentPanel.classList.remove('hidden');
         window.menuUI.gameScreen.classList.remove('hidden');
 
-        // Restore normal game UI 
+        // Ensure normal game UI 
         document.getElementById('score-panel').classList.remove('hidden');
         document.getElementById('next-panel').classList.remove('hidden');
-        document.getElementById('btn-quit').textContent = 'Quit Game';
-        
-        const p1ScoreContainer = document.getElementById('player1-score-container');
-        if (p1ScoreContainer) p1ScoreContainer.classList.add('hidden');
         
         const p1Name = document.getElementById('player1-name');
         if (p1Name) p1Name.classList.add('hidden');
@@ -139,40 +140,25 @@ export class MultiplayerHandler {
         this.isSpectator = true;
         this.spectatorPlayers = players; // Array of 2 player IDs
         
-        window.menuUI.waitingScreen.classList.add('hidden');
-        window.menuUI.opponentPanel.classList.remove('hidden');
-        window.menuUI.gameScreen.classList.remove('hidden');
-        
-        // Hide normal score and next panels in spectator view
-        document.getElementById('score-panel').classList.add('hidden');
-        document.getElementById('next-panel').classList.add('hidden');
-        
-        // Show player 1 score container
-        const p1ScoreContainer = document.getElementById('player1-score-container');
-        if (p1ScoreContainer) p1ScoreContainer.classList.remove('hidden');
-        
-        // Change quit button to initially text
-        document.getElementById('btn-quit').textContent = '처음으로';
-        
-        // Update UI headers
-        const p1Name = document.getElementById('player1-name');
-        if (p1Name) {
-            p1Name.textContent = "Player 1";
-            p1Name.classList.remove('hidden');
+        if (window.menuUI.spectatorScreen) {
+            window.menuUI.hideAllScreens();
+            window.menuUI.spectatorScreen.classList.remove('hidden');
         }
-        document.getElementById('player2-name').textContent = "Player 2";
         
-        document.getElementById('player1-score').textContent = "0";
-        this.opponentScoreElement.textContent = "0";
+        document.getElementById('spec-score-p1').textContent = "0";
+        document.getElementById('spec-score-p2').textContent = "0";
         
         // Clear canvases initially
-        const mainCanvas = document.getElementById('game-canvas');
-        const mainCtx = mainCanvas.getContext('2d');
-        mainCtx.fillStyle = '#111';
-        mainCtx.fillRect(0, 0, mainCanvas.width, mainCanvas.height);
+        const BLOCK_SIZE = 30; // 300/10 = 30, 600/20 = 30
         
-        this.opponentCtx.fillStyle = '#000';
-        this.opponentCtx.fillRect(0, 0, 10, 20);
+        if (this.specCtxP1) {
+            this.specCtxP1.fillStyle = '#111';
+            this.specCtxP1.fillRect(0, 0, this.specCanvasP1.width, this.specCanvasP1.height);
+        }
+        if (this.specCtxP2) {
+            this.specCtxP2.fillStyle = '#111';
+            this.specCtxP2.fillRect(0, 0, this.specCanvasP2.width, this.specCanvasP2.height);
+        }
     }
     
     sendGarbage(lines) {
@@ -222,26 +208,29 @@ export class MultiplayerHandler {
         }
     }
     
-    drawSpectatorMainBoard(grid) {
-        // Draw the main board when spectating (does not use Game object to avoid logic interference)
-        const mainCanvas = document.getElementById('game-canvas');
-        const mainCtx = mainCanvas.getContext('2d');
+    drawSpectatorMainBoard(grid, playerNum = 1) {
+        // Draw the board on the dedicated spectator canvases
+        const ctx = playerNum === 1 ? this.specCtxP1 : this.specCtxP2;
+        const canvas = playerNum === 1 ? this.specCanvasP1 : this.specCanvasP2;
+        
+        if (!ctx || !canvas) return;
+        
         const BLOCK_SIZE = 30;
         
         const COLORS = [
             'none', '#00ffff', '#0000ff', '#ffa500', '#ffff00', '#00ff00', '#800080', '#ff0000', '#888888'
         ];
         
-        mainCtx.fillStyle = '#111';
-        mainCtx.fillRect(0, 0, mainCanvas.width, mainCanvas.height);
+        ctx.fillStyle = '#111';
+        ctx.fillRect(0, 0, canvas.width, canvas.height);
         
         for (let y = 0; y < grid.length; y++) {
             for (let x = 0; x < grid[y].length; x++) {
                 if (grid[y][x] > 0) {
-                    mainCtx.fillStyle = COLORS[grid[y][x]];
-                    mainCtx.fillRect(x * BLOCK_SIZE, y * BLOCK_SIZE, BLOCK_SIZE, BLOCK_SIZE);
-                    mainCtx.strokeStyle = '#222';
-                    mainCtx.strokeRect(x * BLOCK_SIZE, y * BLOCK_SIZE, BLOCK_SIZE, BLOCK_SIZE);
+                    ctx.fillStyle = COLORS[grid[y][x]];
+                    ctx.fillRect(x * BLOCK_SIZE, y * BLOCK_SIZE, BLOCK_SIZE, BLOCK_SIZE);
+                    ctx.strokeStyle = '#222';
+                    ctx.strokeRect(x * BLOCK_SIZE, y * BLOCK_SIZE, BLOCK_SIZE, BLOCK_SIZE);
                 }
             }
         }
