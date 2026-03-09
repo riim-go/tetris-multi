@@ -5,7 +5,8 @@ export let socket = null;
 const DEPLOYED_SERVER_URL = "https://tetris-multi-server.onrender.com";
 
 // Use empty URL if running locally, otherwise use deployed server
-const SERVER_URL = window.location.hostname === "localhost" || window.location.hostname === "127.0.0.1" ? undefined : DEPLOYED_SERVER_URL;
+const isLocal = window.location.hostname === "localhost" || window.location.hostname === "127.0.0.1" || window.location.protocol === "file:";
+const SERVER_URL = isLocal ? "http://localhost:3000" : DEPLOYED_SERVER_URL;
 
 export function initSocket() {
   if (!socket) {
