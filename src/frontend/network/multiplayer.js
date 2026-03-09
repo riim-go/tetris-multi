@@ -93,6 +93,10 @@ export class MultiplayerHandler {
         this.socket.on('spectatorGameEnded', (payload) => {
             if (this.isSpectator) {
                 window.menuUI.showGameOver(`Match Ended: ${payload.reason}`);
+                // 3초 후 메인 메뉴로 자동 복귀
+                setTimeout(() => {
+                    window.menuUI.showMainMenu();
+                }, 3000);
             }
         });
     }
