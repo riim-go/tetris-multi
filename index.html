@@ -28,8 +28,8 @@
             <div class="game-layout">
                 <!-- Left Sidebar (Hold) -->
                 <div class="sidebar">
-                    <!-- Hold removed -->
-                    <div class="panel score-panel">
+                    <!-- Score Panel (Hidden in Spectator) -->
+                    <div id="score-panel" class="panel score-panel">
                         <h3>SCORE</h3>
                         <div id="score">0</div>
                     </div>
@@ -42,11 +42,15 @@
                 <div class="main-board-container">
                     <h3 id="player1-name" style="text-align: center; margin-bottom: 5px; color: #fff; font-size: 1.2rem;" class="hidden">Player 1</h3>
                     <canvas id="game-canvas" width="300" height="600"></canvas>
+                    <div id="player1-score-container" class="hidden" style="margin-top: 10px; text-align: center;">
+                        <span style="font-size: 0.8rem; color: #aaa;">SCORE</span><br>
+                        <span id="player1-score" style="font-size: 1.2rem; font-weight: bold; color: #ff3366;">0</span>
+                    </div>
                 </div>
                 
                 <!-- Right Sidebar (Next) -->
                 <div class="sidebar">
-                    <div class="panel">
+                    <div id="next-panel" class="panel">
                         <h3>NEXT</h3>
                         <canvas id="next-canvas" width="120" height="120"></canvas>
                     </div>

@@ -83,7 +83,7 @@ export class MultiplayerHandler {
         this.socket.on('spectatorScoreUpdate', (payload) => {
             if (this.isSpectator) {
                 if (payload.playerId === this.spectatorPlayers[0]) {
-                    document.getElementById('score').textContent = payload.score;
+                    document.getElementById('player1-score').textContent = payload.score;
                 } else if (payload.playerId === this.spectatorPlayers[1]) {
                     this.opponentScoreElement.textContent = payload.score;
                 }
@@ -106,6 +106,18 @@ export class MultiplayerHandler {
         window.menuUI.waitingScreen.classList.add('hidden');
         window.menuUI.opponentPanel.classList.remove('hidden');
         window.menuUI.gameScreen.classList.remove('hidden');
+
+        // Restore normal game UI 
+        document.getElementById('score-panel').classList.remove('hidden');
+        document.getElementById('next-panel').classList.remove('hidden');
+        document.getElementById('btn-quit').textContent = 'Quit Game';
+        
+        const p1ScoreContainer = document.getElementById('player1-score-container');
+        if (p1ScoreContainer) p1ScoreContainer.classList.add('hidden');
+        
+        const p1Name = document.getElementById('player1-name');
+        if (p1Name) p1Name.classList.add('hidden');
+        document.getElementById('player2-name').textContent = "OPPONENT";
 
         this.opponentScoreElement.textContent = "0";
 
@@ -131,6 +143,17 @@ export class MultiplayerHandler {
         window.menuUI.opponentPanel.classList.remove('hidden');
         window.menuUI.gameScreen.classList.remove('hidden');
         
+        // Hide normal score and next panels in spectator view
+        document.getElementById('score-panel').classList.add('hidden');
+        document.getElementById('next-panel').classList.add('hidden');
+        
+        // Show player 1 score container
+        const p1ScoreContainer = document.getElementById('player1-score-container');
+        if (p1ScoreContainer) p1ScoreContainer.classList.remove('hidden');
+        
+        // Change quit button to initially text
+        document.getElementById('btn-quit').textContent = '처음으로';
+        
         // Update UI headers
         const p1Name = document.getElementById('player1-name');
         if (p1Name) {
@@ -139,7 +162,7 @@ export class MultiplayerHandler {
         }
         document.getElementById('player2-name').textContent = "Player 2";
         
-        document.getElementById('score').textContent = "0";
+        document.getElementById('player1-score').textContent = "0";
         this.opponentScoreElement.textContent = "0";
         
         // Clear canvases initially
