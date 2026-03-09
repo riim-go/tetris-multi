@@ -38,8 +38,9 @@
                     <button id="btn-quit" class="quit-button">Quit Game</button>
                 </div>
                 
-                <!-- Main Game Board -->
+                <!-- Main Game Board (Player 1) -->
                 <div class="main-board-container">
+                    <h3 id="player1-name" style="text-align: center; margin-bottom: 5px; color: #fff; font-size: 1.2rem;" class="hidden">Player 1</h3>
                     <canvas id="game-canvas" width="300" height="600"></canvas>
                 </div>
                 
@@ -52,7 +53,7 @@
                     
                     <!-- Opponent Board (Hidden in Single Play) -->
                     <div id="opponent-panel" class="panel hidden">
-                        <h3>OPPONENT</h3>
+                        <h3 id="player2-name">OPPONENT</h3>
                         <canvas id="opponent-canvas" width="150" height="300"></canvas>
                         <div class="opponent-score-container" style="margin-top: 10px; text-align: center;">
                             <span style="font-size: 0.8rem; color: #aaa;">SCORE</span><br>

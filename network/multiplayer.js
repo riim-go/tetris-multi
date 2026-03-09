@@ -10,6 +10,9 @@ export class MultiplayerHandler {
         // 스케일 설정: 150/10 = 15, 300/20 = 15
         this.opponentCtx.scale(15, 15);
         this.opponentScoreElement = document.getElementById('opponent-score');
+        
+        this.isSpectator = false;
+        this.spectatorPlayers = [];
     }
 
     startMatchmaking() {
@@ -53,10 +56,44 @@ export class MultiplayerHandler {
         });
 
         this.socket.on('opponentQuit', () => {
-             if (this.game && !this.game.isGameOver) {
+             if (this.game && !this.game.isGameOver && !this.isSpectator) {
                  this.game.stop();
                  window.menuUI.showGameOver("Opponent Quit. You Win!");
              }
+        });
+
+        // Spectator events
+        this.socket.on('startSpectator', (data) => {
+            console.log('Joined as spectator! Room ID:', data.roomId);
+            this.startSpectating(data.players);
+        });
+
+        this.socket.on('spectatorBoardUpdate', (payload) => {
+            if (this.isSpectator) {
+                if (payload.playerId === this.spectatorPlayers[0]) {
+                    // Update main canvas directly as Player 1
+                    this.drawSpectatorMainBoard(payload.board);
+                } else if (payload.playerId === this.spectatorPlayers[1]) {
+                    // Update opponent canvas as Player 2
+                    this.drawOpponentBoard(payload.board);
+                }
+            }
+        });
+
+        this.socket.on('spectatorScoreUpdate', (payload) => {
+            if (this.isSpectator) {
+                if (payload.playerId === this.spectatorPlayers[0]) {
+                    document.getElementById('score').textContent = payload.score;
+                } else if (payload.playerId === this.spectatorPlayers[1]) {
+                    this.opponentScoreElement.textContent = payload.score;
+                }
+            }
+        });
+
+        this.socket.on('spectatorGameEnded', (payload) => {
+            if (this.isSpectator) {
+                window.menuUI.showGameOver(`Match Ended: ${payload.reason}`);
+            }
         });
     }
 
@@ -76,10 +113,39 @@ export class MultiplayerHandler {
         
         // 주기적으로 보드 상태 전송 (예: 200ms)
         this.syncInterval = setInterval(() => {
-            if (this.game && !this.game.isGameOver) {
+            if (this.game && !this.game.isGameOver && !this.isSpectator) {
                 this.socket.emit('boardUpdate', { board: this.game.board.grid });
             }
         }, 200);
+    }
+    
+    startSpectating(players) {
+        this.isSpectator = true;
+        this.spectatorPlayers = players; // Array of 2 player IDs
+        
+        window.menuUI.waitingScreen.classList.add('hidden');
+        window.menuUI.opponentPanel.classList.remove('hidden');
+        window.menuUI.gameScreen.classList.remove('hidden');
+        
+        // Update UI headers
+        const p1Name = document.getElementById('player1-name');
+        if (p1Name) {
+            p1Name.textContent = "Player 1";
+            p1Name.classList.remove('hidden');
+        }
+        document.getElementById('player2-name').textContent = "Player 2";
+        
+        document.getElementById('score').textContent = "0";
+        this.opponentScoreElement.textContent = "0";
+        
+        // Clear canvases initially
+        const mainCanvas = document.getElementById('game-canvas');
+        const mainCtx = mainCanvas.getContext('2d');
+        mainCtx.fillStyle = '#111';
+        mainCtx.fillRect(0, 0, mainCanvas.width, mainCanvas.height);
+        
+        this.opponentCtx.fillStyle = '#000';
+        this.opponentCtx.fillRect(0, 0, 10, 20);
     }
     
     sendGarbage(lines) {
@@ -124,6 +190,31 @@ export class MultiplayerHandler {
                     this.opponentCtx.lineWidth = 0.1;
                     this.opponentCtx.strokeStyle = '#222';
                     this.opponentCtx.strokeRect(x, y, 1, 1);
+                }
+            }
+        }
+    }
+    
+    drawSpectatorMainBoard(grid) {
+        // Draw the main board when spectating (does not use Game object to avoid logic interference)
+        const mainCanvas = document.getElementById('game-canvas');
+        const mainCtx = mainCanvas.getContext('2d');
+        const BLOCK_SIZE = 30;
+        
+        const COLORS = [
+            'none', '#00ffff', '#0000ff', '#ffa500', '#ffff00', '#00ff00', '#800080', '#ff0000', '#888888'
+        ];
+        
+        mainCtx.fillStyle = '#111';
+        mainCtx.fillRect(0, 0, mainCanvas.width, mainCanvas.height);
+        
+        for (let y = 0; y < grid.length; y++) {
+            for (let x = 0; x < grid[y].length; x++) {
+                if (grid[y][x] > 0) {
+                    mainCtx.fillStyle = COLORS[grid[y][x]];
+                    mainCtx.fillRect(x * BLOCK_SIZE, y * BLOCK_SIZE, BLOCK_SIZE, BLOCK_SIZE);
+                    mainCtx.strokeStyle = '#222';
+                    mainCtx.strokeRect(x * BLOCK_SIZE, y * BLOCK_SIZE, BLOCK_SIZE, BLOCK_SIZE);
                 }
             }
         }
