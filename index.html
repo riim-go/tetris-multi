@@ -1,79 +1,99 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="ko">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Tetris Multiplayer</title>
-    <link rel="stylesheet" href="style.css">
-</head>
-<body>
+    <link rel="stylesheet" href="style.css" />
+  </head>
+  <body>
     <div id="app">
-        <!-- Main Menu -->
-        <div id="main-menu" class="screen">
-            <h1>Tetris</h1>
-            <div class="menu-buttons">
-                <button id="btn-single">Single Play</button>
-                <button id="btn-multi">Multi Play</button>
-            </div>
+      <!-- Main Menu -->
+      <div id="main-menu" class="screen">
+        <h1>Tetris</h1>
+        <div class="menu-buttons">
+          <button id="btn-single">Single Play</button>
+          <button id="btn-multi">Multi Play</button>
         </div>
-        
-        <!-- Waiting Screen for Multiplayer -->
-        <div id="waiting-screen" class="screen hidden">
-            <h2>매칭 대기 중...</h2>
-            <div class="loader"></div>
+      </div>
+
+      <!-- Waiting Screen for Multiplayer -->
+      <div id="waiting-screen" class="screen hidden">
+        <h2>매칭 대기 중...</h2>
+        <div class="loader"></div>
+      </div>
+
+      <!-- Game Screen -->
+      <div id="game-screen" class="screen hidden">
+        <div class="game-layout">
+          <!-- Left Sidebar (Hold) -->
+          <div class="sidebar">
+            <!-- Score Panel (Hidden in Spectator) -->
+            <div id="score-panel" class="panel score-panel">
+              <h3>SCORE</h3>
+              <div id="score">0</div>
+            </div>
+
+            <!-- Quit Button -->
+            <button id="btn-quit" class="quit-button">Quit Game</button>
+          </div>
+
+          <!-- Main Game Board (Player 1) -->
+          <div class="main-board-container">
+            <h3 id="player1-name" style="text-align: center; margin-bottom: 5px; color: #fff; font-size: 1.2rem" class="hidden">Player 1</h3>
+            <canvas id="game-canvas" width="300" height="600"></canvas>
+          </div>
+
+          <!-- Right Sidebar (Next) -->
+          <div class="sidebar">
+            <div id="next-panel" class="panel">
+              <h3>NEXT</h3>
+              <canvas id="next-canvas" width="120" height="120"></canvas>
+            </div>
+
+            <!-- Opponent Board (Hidden in Single Play) -->
+            <div id="opponent-panel" class="panel hidden">
+              <h3 id="player2-name">OPPONENT</h3>
+              <canvas id="opponent-canvas" width="150" height="300"></canvas>
+              <div class="opponent-score-container" style="margin-top: 10px; text-align: center">
+                <span style="font-size: 0.8rem; color: #aaa">SCORE</span><br />
+                <span id="opponent-score" style="font-size: 1.2rem; font-weight: bold; color: #ff3366">0</span>
+              </div>
+            </div>
+          </div>
         </div>
 
-        <!-- Game Screen -->
-        <div id="game-screen" class="screen hidden">
-            <div class="game-layout">
-                <!-- Left Sidebar (Hold) -->
-                <div class="sidebar">
-                    <!-- Score Panel (Hidden in Spectator) -->
-                    <div id="score-panel" class="panel score-panel">
-                        <h3>SCORE</h3>
-                        <div id="score">0</div>
-                    </div>
-                    
-                    <!-- Quit Button -->
-                    <button id="btn-quit" class="quit-button">Quit Game</button>
-                </div>
-                
-                <!-- Main Game Board (Player 1) -->
-                <div class="main-board-container">
-                    <h3 id="player1-name" style="text-align: center; margin-bottom: 5px; color: #fff; font-size: 1.2rem;" class="hidden">Player 1</h3>
-                    <canvas id="game-canvas" width="300" height="600"></canvas>
-                    <div id="player1-score-container" class="hidden" style="margin-top: 10px; text-align: center;">
-                        <span style="font-size: 0.8rem; color: #aaa;">SCORE</span><br>
-                        <span id="player1-score" style="font-size: 1.2rem; font-weight: bold; color: #ff3366;">0</span>
-                    </div>
-                </div>
-                
-                <!-- Right Sidebar (Next) -->
-                <div class="sidebar">
-                    <div id="next-panel" class="panel">
-                        <h3>NEXT</h3>
-                        <canvas id="next-canvas" width="120" height="120"></canvas>
-                    </div>
-                    
-                    <!-- Opponent Board (Hidden in Single Play) -->
-                    <div id="opponent-panel" class="panel hidden">
-                        <h3 id="player2-name">OPPONENT</h3>
-                        <canvas id="opponent-canvas" width="150" height="300"></canvas>
-                        <div class="opponent-score-container" style="margin-top: 10px; text-align: center;">
-                            <span style="font-size: 0.8rem; color: #aaa;">SCORE</span><br>
-                            <span id="opponent-score" style="font-size: 1.2rem; font-weight: bold; color: #ff3366;">0</span>
-                        </div>
-                    </div>
-                </div>
-            </div>
-            
-            <!-- Game Over Overlay -->
-            <div id="game-over-screen" class="overlay hidden">
-                <h2>GAME OVER</h2>
-                <div id="result-message"></div>
-                <button id="btn-menu">Main Menu</button>
-            </div>
+        <!-- Game Over Overlay -->
+        <div id="game-over-screen" class="overlay hidden">
+          <h2>GAME OVER</h2>
+          <div id="result-message"></div>
+          <button id="btn-menu">Main Menu</button>
         </div>
+      </div>
+
+      <!-- Spectator Screen -->
+      <div id="spectator-screen" class="screen hidden">
+        <h2 style="margin-bottom: 20px; color: var(--accent-color)">SPECTATOR MODE</h2>
+        <div class="spectator-layout" style="display: flex; gap: 40px; justify-content: center; align-items: flex-end; margin-bottom: 30px">
+          <div class="spectator-board-container">
+            <h3 id="spec-player1-name" style="text-align: center; margin-bottom: 10px; color: #fff">Player 1</h3>
+            <canvas id="spec-canvas-p1" width="300" height="600"></canvas>
+            <div style="margin-top: 15px; text-align: center">
+              <span style="font-size: 1rem; color: #aaa">SCORE</span><br />
+              <span id="spec-score-p1" style="font-size: 1.5rem; font-weight: bold; color: #ff3366">0</span>
+            </div>
+          </div>
+          <div class="spectator-board-container">
+            <h3 id="spec-player2-name" style="text-align: center; margin-bottom: 10px; color: #fff">Player 2</h3>
+            <canvas id="spec-canvas-p2" width="300" height="600"></canvas>
+            <div style="margin-top: 15px; text-align: center">
+              <span style="font-size: 1rem; color: #aaa">SCORE</span><br />
+              <span id="spec-score-p2" style="font-size: 1.5rem; font-weight: bold; color: #ff3366">0</span>
+            </div>
+          </div>
+        </div>
+        <button id="btn-spec-quit" class="quit-button">HOME</button>
+      </div>
     </div>
 
     <!-- Use CDN for socket.io so it works on GitHub Pages -->
@@ -82,5 +102,5 @@
     <script type="module" src="network/multiplayer.js"></script>
     <script type="module" src="ui/game_ui.js"></script>
     <script type="module" src="ui/menu.js"></script>
-</body>
+  </body>
 </html>

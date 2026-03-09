@@ -9,8 +9,10 @@ export class MenuUI {
         this.btnMulti = document.getElementById('btn-multi');
         this.btnMenu = document.getElementById('btn-menu');
         this.btnQuit = document.getElementById('btn-quit');
+        this.btnSpecQuit = document.getElementById('btn-spec-quit');
         
         this.opponentPanel = document.getElementById('opponent-panel');
+        this.spectatorScreen = document.getElementById('spectator-screen');
         
         this.initEventListeners();
     }
@@ -31,6 +33,12 @@ export class MenuUI {
         this.btnQuit.addEventListener('click', () => {
             this.quitGame();
         });
+        
+        if (this.btnSpecQuit) {
+            this.btnSpecQuit.addEventListener('click', () => {
+                this.quitGame();
+            });
+        }
     }
 
     startSinglePlay() {
@@ -80,6 +88,7 @@ export class MenuUI {
         this.gameScreen.classList.add('hidden');
         this.waitingScreen.classList.add('hidden');
         this.gameOverScreen.classList.add('hidden');
+        if (this.spectatorScreen) this.spectatorScreen.classList.add('hidden');
     }
 }
 
