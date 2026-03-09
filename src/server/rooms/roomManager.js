@@ -48,11 +48,13 @@ class RoomManager {
 
     getActiveRoom() {
         // Find the first room that is currently playing (has 2 players max)
-        for (const room of this.rooms.values()) {
+        for (const [roomId, room] of this.rooms.entries()) {
+            console.log(`Checking room ${roomId}: players=${room.players.length}`);
             if (room.players.length === 2) {
                 return room;
             }
         }
+        console.log('No active rooms found for spectating');
         return null;
     }
 
