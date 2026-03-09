@@ -1,0 +1,14 @@
+{
+  "name": "tetris-multi",
+  "version": "1.0.0",
+  "description": "Multiplayer Tetris Web Game",
+  "main": "src/server/index.js",
+  "scripts": {
+    "start": "node src/server/index.js"
+  },
+  "dependencies": {
+    "cors": "^2.8.6",
+    "express": "^4.18.2",
+    "socket.io": "^4.7.2"
+  }
+}

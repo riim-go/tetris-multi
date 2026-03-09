@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tetris Multiplayer</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div id="app">
+        <!-- Main Menu -->
+        <div id="main-menu" class="screen">
+            <h1>Tetris</h1>
+            <div class="menu-buttons">
+                <button id="btn-single">Single Play</button>
+                <button id="btn-multi">Multi Play</button>
+            </div>
+        </div>
+        
+        <!-- Waiting Screen for Multiplayer -->
+        <div id="waiting-screen" class="screen hidden">
+            <h2>매칭 대기 중...</h2>
+            <div class="loader"></div>
+        </div>
+
+        <!-- Game Screen -->
+        <div id="game-screen" class="screen hidden">
+            <div class="game-layout">
+                <!-- Left Sidebar (Hold) -->
+                <div class="sidebar">
+                    <!-- Hold removed -->
+                    <div class="panel score-panel">
+                        <h3>SCORE</h3>
+                        <div id="score">0</div>
+                    </div>
+                    
+                    <!-- Quit Button -->
+                    <button id="btn-quit" class="quit-button">Quit Game</button>
+                </div>
+                
+                <!-- Main Game Board -->
+                <div class="main-board-container">
+                    <canvas id="game-canvas" width="300" height="600"></canvas>
+                </div>
+                
+                <!-- Right Sidebar (Next) -->
+                <div class="sidebar">
+                    <div class="panel">
+                        <h3>NEXT</h3>
+                        <canvas id="next-canvas" width="120" height="120"></canvas>
+                    </div>
+                    
+                    <!-- Opponent Board (Hidden in Single Play) -->
+                    <div id="opponent-panel" class="panel hidden">
+                        <h3>OPPONENT</h3>
+                        <canvas id="opponent-canvas" width="150" height="300"></canvas>
+                        <div class="opponent-score-container" style="margin-top: 10px; text-align: center;">
+                            <span style="font-size: 0.8rem; color: #aaa;">SCORE</span><br>
+                            <span id="opponent-score" style="font-size: 1.2rem; font-weight: bold; color: #ff3366;">0</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Game Over Overlay -->
+            <div id="game-over-screen" class="overlay hidden">
+                <h2>GAME OVER</h2>
+                <div id="result-message"></div>
+                <button id="btn-menu">Main Menu</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Use CDN for socket.io so it works on GitHub Pages -->
+    <script src="https://cdn.socket.io/4.7.2/socket.io.min.js"></script>
+    <script type="module" src="network/socket.js"></script>
+    <script type="module" src="network/multiplayer.js"></script>
+    <script type="module" src="ui/game_ui.js"></script>
+    <script type="module" src="ui/menu.js"></script>
+</body>
+</html>
