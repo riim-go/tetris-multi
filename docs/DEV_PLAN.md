@@ -56,7 +56,6 @@ Tasks
 - 게임 오버 처리
 - 점수 표시
 - 다음 블록 표시
-- Hold 블록 기능
 
 Deliverables
 

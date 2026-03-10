@@ -16,7 +16,7 @@
 
 ## Controls
 
-Move Left : ArrowLeft Move Right : ArrowRight Soft Drop : ArrowDown Hard Drop : Space Rotate : ArrowUp Hold Block : Shift
+Move Left : ArrowLeft Move Right : ArrowRight Soft Drop : ArrowDown Hard Drop : Space Rotate : ArrowUp
 
 ## Game Flow
 

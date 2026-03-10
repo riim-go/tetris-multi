@@ -36,7 +36,6 @@
 - Game board
 - Score
 - Next block
-- Hold block
 
 ### Multiplayer UI
 

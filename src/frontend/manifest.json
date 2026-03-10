@@ -1,0 +1,17 @@
+{
+  "name": "Tetris Multiplayer",
+  "short_name": "Tetris",
+  "description": "Multiplayer Tetris Web Game",
+  "start_url": "./",
+  "display": "standalone",
+  "background_color": "#1a1a1a",
+  "theme_color": "#ff3366",
+  "icons": [
+    {
+      "src": "./icons/icon.svg",
+      "type": "image/svg+xml",
+      "sizes": "192x192 512x512",
+      "purpose": "any maskable"
+    }
+  ]
+}
